@@ -7,7 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 
 import com.earshot.project.main.R;
@@ -17,14 +16,8 @@ import com.earshot.project.main.R;
  */
 public class MicrophoneView extends View  {
 
-
-    //    TODO: get values from xml
-    private static final int INNER = Color.parseColor("#ff4444");
     private static final int OUTER = Color.parseColor("#bebebe");
-    private static final int MICROPHONE_CIRCLE_RADIUS = 100;
-
-    private int touchRadius = MICROPHONE_CIRCLE_RADIUS;
-    private double audioLevel = 0;
+    private static final int MICROPHONE_CIRCLE_RADIUS = 70;
 
     private Paint innerCirclePaint;
     private Paint outerCirclePaint;
@@ -34,9 +27,6 @@ public class MicrophoneView extends View  {
 
     private Bitmap buttonBitmap;
     private Bitmap buttonLightBitmap;
-    private Bitmap buttonPressedBitmap;
-
-    private boolean isSelected;
     private boolean isRecording;
 
     public MicrophoneView(Context context) {
@@ -54,62 +44,28 @@ public class MicrophoneView extends View  {
         init();
     }
 
+    public boolean toggle(){
+        if (isRecording)
+            close();
+        else
+            start();
+        return isRecording;
+    }
+
+    private void start(){
+        isRecording = true;
+        invalidate();
+    }
+
+    private void close(){
+        isRecording = false;
+        invalidate();
+    }
+
     private void init() {
         buttonBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_mic_out_grey);
         buttonLightBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_mic_out_light);
-        buttonPressedBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_mic_out_pressed);
         isRecording = false;
-        isSelected = false;
-    }
-
-    private static boolean isInCircle(float x, float y, float circleCenterX, float circleCenterY, float circleRadius) {
-        double dx = Math.pow(x - circleCenterX, 2);
-        double dy = Math.pow(y - circleCenterY, 2);
-
-        if ((dx + dy) < Math.pow(circleRadius, 2)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        boolean shouldReturnFalse = false;
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            if (isInCircle(event.getX(), event.getY(), getWidth() / 2, getHeight() / 2, touchRadius)) {
-                innerCirclePaint.setColor(OUTER);
-                isSelected = true;
-            }
-        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            if (isInCircle(event.getX(), event.getY(), getWidth() / 2, getHeight() / 2, touchRadius)) {
-                innerCirclePaint.setColor(OUTER);
-                isSelected = true;
-            } else {
-                if (!isRecording)
-                    innerCirclePaint.setColor(Color.WHITE);
-                else
-                    innerCirclePaint.setColor(INNER);
-                shouldReturnFalse = true;
-                isSelected = false;
-            }
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-            if (isInCircle(event.getX(), event.getY(), getWidth() / 2, getHeight() / 2, touchRadius)) {
-                isSelected = false;
-            } else {
-                if (!isRecording)
-                    innerCirclePaint.setColor(Color.WHITE);
-                else
-                    innerCirclePaint.setColor(INNER);
-                shouldReturnFalse = true;
-                isSelected = false;
-            }
-        }
-        invalidate();
-        if (shouldReturnFalse)
-            return false;
-
-        return super.onTouchEvent(event);
     }
 
     @Override
@@ -122,7 +78,7 @@ public class MicrophoneView extends View  {
             if (!isRecording)
                 innerCirclePaint.setColor(Color.WHITE);
             if (isRecording)
-                innerCirclePaint.setColor(INNER);
+                innerCirclePaint.setColor(Color.RED);
             innerCirclePaint.setStrokeWidth(1);
             innerCirclePaint.setStyle(Paint.Style.FILL_AND_STROKE);
             innerCirclePaint.setAntiAlias(true);
@@ -146,32 +102,21 @@ public class MicrophoneView extends View  {
             bitmapPaint.setDither(true);
         }
 
-        if ((audioLevel > 0) && isRecording) {
-            double radius = audioLevel * (getWidth() / 3) / 100;
-            if (radius > getWidth() / 3)
-                radius = getWidth() / 3;
-            touchRadius = (int) radius;
-            canvas.drawCircle(getWidth() / 2, getHeight() / 2, (int) radius, audioLevelCirclePaint);
-        } else {
-            touchRadius = MICROPHONE_CIRCLE_RADIUS;
-        }
+        Bitmap bitmap = null;
 
+        if (isRecording) {
+            bitmap = buttonLightBitmap;
+            innerCirclePaint.setColor(Color.parseColor("#f44336"));
+        }
+        else {
+            bitmap = buttonBitmap;
+            innerCirclePaint.setColor(Color.WHITE);
+        }
         canvas.drawCircle(getWidth() / 2, getHeight() / 2, MICROPHONE_CIRCLE_RADIUS, innerCirclePaint);
         canvas.drawCircle(getWidth() / 2, getHeight() / 2, MICROPHONE_CIRCLE_RADIUS + 5, outerCirclePaint);
 
-        Bitmap bitmap = null;
-
-        if (isRecording)
-            bitmap = buttonLightBitmap;
-        else if (!isRecording)
-            bitmap = buttonBitmap;
-
-        if (isSelected) {
-            bitmap = buttonPressedBitmap;
-        }
-
         if (bitmap != null) {
-			/* Draw center microphone */
+			// Draw center microphone
             canvas.drawBitmap(bitmap,
                     (getWidth() / 2) - (buttonBitmap.getWidth() / 2),
                     (getHeight() / 2) - (buttonBitmap.getHeight() / 2),
@@ -179,54 +124,15 @@ public class MicrophoneView extends View  {
         }
     }
 
-    private boolean changingValue = false;
-
 
     public void setRecordingMode(boolean recording) {
         isRecording = recording;
-        if (innerCirclePaint == null)
-            return;
-
-        if (!isRecording)
-            innerCirclePaint.setColor(Color.WHITE);
-        else if (isRecording)
-            innerCirclePaint.setColor(INNER);
-
         invalidate();
     }
 
-//    @Override
-//    public void onAudioLevelChanged(double percentage) {
-//        percentage *= 50;
-//        if (this.audioLevel == percentage)
-//            return;
-//
-//        if (!isRecording) {
-//            isRecording = true;
-//        }
-//
-//        if (changingValue)
-//            return;
-//
-//        changingValue = true;
-//
-//        int diff = (int) Math.abs(this.audioLevel - percentage);
-//
-////        while (diff > 0) {
-////            if (this.audioLevel > percentage) {
-////                audioLevel-=10;
-////            } else {
-////                audioLevel+=10;
-////            }
-////
-////            diff = (int) Math.abs(this.audioLevel - percentage);
-////            invalidate();
-////        }
-//
-//        changingValue = false;
-//
-//        this.audioLevel = percentage;
-//        invalidate();
-//
-//    }
+    public boolean getRecordingMode(){
+        return isRecording;
+    }
+
+
 }

@@ -29,6 +29,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.earshot.doreso.record.RecordListener;
 import com.earshot.project.main.views.AnimationState;
 import com.earshot.project.main.views.MicrophoneView;
+import com.earshot.project.main.views.Ripples;
 import com.earshot.spotify.Spotify;
 import com.earshot.spotify.SpotifySingleton;
 import com.earshot.spotify.SpotifyTrack;
@@ -60,7 +61,7 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
     String token;
 
 
-    private static final String TAG = "nlc";
+    private static final String TAG = MainActivity.class.getSimpleName();
 
 
     private MicrophoneView mRecordButton;
@@ -74,6 +75,7 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
     protected TextView mTextViewArtistName;
     protected View mButtonAdd;
     protected View mOverlay;
+    protected Ripples mRippleBackground;
 
     private float mInitialSongButtonX;
 
@@ -83,7 +85,6 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
     private Animation mAddButtonShowAnimation;
 
     private AnimationState mState = AnimationState.Closed;
-
 
     static int sScreenWidth;
     static int sSongImageHeight;
@@ -104,30 +105,29 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
         setContentView(R.layout.activity_main);
 
         mWrapper = (RelativeLayout) findViewById(R.id.wrapper);
-        mToolbar = (FrameLayout) findViewById(R.id.toolbar_list);
-        mToolbarSong = (RelativeLayout) findViewById(R.id.toolbar_song);
-        mSongDetails = (LinearLayout) findViewById(R.id.wrapper_song_details);
+        mToolbar = (FrameLayout) findViewById(R.id.main_toolbar);
+        mToolbarSong = (RelativeLayout) findViewById(R.id.song_details_toolbar);
+        mSongDetails = (LinearLayout) findViewById(R.id.song_details);
         mTextViewSongName = (TextView) findViewById(R.id.text_view_song_name);
         mTextViewAlbumName = (TextView) findViewById(R.id.text_view_album_name);
         mTextViewArtistName = (TextView) findViewById(R.id.text_view_artist_name);
-        mButtonAdd = findViewById(R.id.button_add);
+        mButtonAdd = findViewById(R.id.spotify_add);
 
-        mRecordButton = (MicrophoneView) findViewById(R.id.record);
+        mRippleBackground =(Ripples)findViewById(R.id.ripples);
+
+        mRecordButton = (MicrophoneView) findViewById(R.id.micButton);
         mLoginButton = (Button) findViewById(R.id.loginButton);
 
         mInitialSongButtonX = mButtonAdd.getX();
 
-        findViewById(R.id.toolbar_song_back).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.song_details_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 animateCloseSongDetails();
             }
         });
-
         sScreenWidth = getResources().getDisplayMetrics().widthPixels;
         sSongImageHeight = getResources().getDimensionPixelSize(R.dimen.height_song_image);
-
-
     }
 
 
@@ -147,20 +147,33 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
         mRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRecordListener.start();
+                if (mRecordButton.toggle()){
+                    mRippleBackground.startRippleAnimation();
+                    mRecordListener.start();
+                } else {
+                    mRippleBackground.stopRippleAnimation();
+                    mRecordListener.stop();
+                }
             }
         });
 
         mButtonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                addToPlyalist();
+               addToPlyalist();
             }
         });
     }
 
+
+    public void addToPlyalist(){
+
+    }
+
     private void showSongDetails(SpotifyTrack track){
-        mRecordButton.setEnabled(false);
+        mRippleBackground.stopRippleAnimation();
+        mRippleBackground.setVisibility(View.INVISIBLE);
+        mRecordButton.setRecordingMode(false);
         mRecordButton.setVisibility(View.INVISIBLE);
 
         //if we add more stuff at radom places, this will keep the time normalized based
@@ -170,7 +183,7 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
                 / sScreenWidth;
 
         //Make copy
-        makeViewCopy(track);
+        makeSongImageDetailsView(track);
         //responsible for the circular reveal
         startRevealAnimation(songDetailsAnimationDelay);
         //other transitions to put data where it belongs
@@ -178,7 +191,7 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
     }
 
 
-    private void makeViewCopy(SpotifyTrack track){
+    private void makeSongImageDetailsView(SpotifyTrack track){
         if (mOverlay == null)
             mOverlay = getLayoutInflater().inflate(R.layout.overlay_song, mWrapper, false);
         else
@@ -312,8 +325,6 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
                 mSongDetails.setX(0);
                 mSongDetails.bringToFront();
                 mSongDetails.setVisibility(View.VISIBLE);
-
-//                mButtonAdd.setX(mInitialSongButtonX);
                 mButtonAdd.bringToFront();
             }
 
@@ -360,10 +371,6 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
                     0, mOverlay.getWidth());
             songPhotoAnimator.setStartDelay(STEP_DELAY_HIDE_DETAILS_ANIMATION);
 
-//            Animator profileButtonAnimator = ObjectAnimator.ofFloat(mButtonAdd, View.X,
-//                    mInitialSongButtonX,  mInitialSongButtonX);
-//            profileButtonAnimator.setStartDelay(STEP_DELAY_HIDE_DETAILS_ANIMATION * 2);
-
             Animator songDetailsAnimator = ObjectAnimator.ofFloat(mSongDetails, View.X,
                     0, mToolbarSong.getWidth());
             songDetailsAnimator.setStartDelay(STEP_DELAY_HIDE_DETAILS_ANIMATION * 2);
@@ -371,7 +378,6 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
             List<Animator> songAnimators = new ArrayList<>();
             songAnimators.add(songToolbarAnimator);
             songAnimators.add(songPhotoAnimator);
-//            profileAnimators.add(profileButtonAnimator);
             songAnimators.add(songDetailsAnimator);
 
             mCloseSongAnimatorSet = new AnimatorSet();
@@ -381,22 +387,15 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
             mCloseSongAnimatorSet.addListener(new Animator.AnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
-//                    if (mListViewAnimator != null) {
-//                        mListViewAnimator.reset();
-//                        mListViewAnimationAdapter.notifyDataSetChanged();
-//                    }
                     mButtonAdd.setVisibility(View.INVISIBLE);
                 }
 
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     mToolbarSong.setVisibility(View.INVISIBLE);
-
                     mSongDetails.setVisibility(View.INVISIBLE);
-
-                    mRecordButton.setEnabled(true);
                     mRecordButton.setVisibility(View.VISIBLE);
-
+                    mRippleBackground.setVisibility(View.VISIBLE);
                     mState = AnimationState.Closed;
                 }
 
@@ -441,6 +440,8 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
                 + "q=track:" + track
                 + "+artist:" + artist
                 + "&type=track&limit=1";
+
+
 
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,  successSong, failureSong);
         queue.add(getRequest);
@@ -490,7 +491,12 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
 
     @Override
     public void onRecognozeFailure() {
+        if (mRecordButton.getRecordingMode()){
+            mRippleBackground.stopRippleAnimation();
+            mRecordButton.setRecordingMode(false);
+        }
         Toast.makeText(getApplicationContext(), "Couldn't find the track.", Toast.LENGTH_LONG).show();
+
     }
 
     @Override

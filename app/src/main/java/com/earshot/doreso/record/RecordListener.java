@@ -23,8 +23,7 @@ public class RecordListener implements DoresoRecordInterface,DoresoListener {
     private DoresoRecord mDoresoRecord;
     private boolean mProcessing;
     private DoresoConfig mConfig;
-    private static Activity mContext;
-    private static final String TAG = "NLC";
+    private static final String TAG = RecordListener.class.getSimpleName();
     private static final String APPKEY = "";
     private static final String APPSECRET = "";
     RecordListnerResultListener listener;
@@ -34,7 +33,6 @@ public class RecordListener implements DoresoRecordInterface,DoresoListener {
         mConfig.appkey = APPKEY;
         mConfig.appSecret = APPSECRET;
         mConfig.listener = this;
-        mContext = context;
         mConfig.context = context;
         mDoresoManager = new DoresoManager(mConfig);
         mDoresoRecord = new DoresoRecord(this, 16 * 1000);
@@ -54,7 +52,7 @@ public class RecordListener implements DoresoRecordInterface,DoresoListener {
             mDoresoRecord = new DoresoRecord(this, 15*1024);
             mDoresoRecord.start();
             if (!mDoresoManager.startRecognize()) {
-                //      Toast.makeText(this, "无网络,无法识别", Toast.LENGTH_SHORT).show();
+//                      Toast.makeText(, "无网络,无法识别", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -97,14 +95,6 @@ public class RecordListener implements DoresoRecordInterface,DoresoListener {
                 + "album" + "\n"
                 + tracks[0].getAlbum() + "\n" + result);
 
-
-
-//        SpotifyTrack track = new SpotifyTrack(tracks[0].getName(),tracks[0].getArtist(), mContext);
-//        Log.i(TAG,"doreso result string"+result);
-
-        // Test adding a track to a playlist
-//        Spotify spotify = SpotifySingleton.getSpotifyInstance(mContext);
-//        spotify.addTrackToPlaylist(track.getUri());
         mProcessing = false;
         listener.onRecognizeSuccess(tracks[0].getArtist(), tracks[0].getName());
 
