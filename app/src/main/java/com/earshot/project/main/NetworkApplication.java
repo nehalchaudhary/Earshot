@@ -23,8 +23,10 @@ public class NetworkApplication extends Application {
 
     public void onTrimMemory(int level) {
         if (level == TRIM_MEMORY_UI_HIDDEN) {
-            queue.stop();
-            queue = null;
+            if (queue != null) {
+                queue.stop();
+                queue = null;
+            }
         }
     }
 
