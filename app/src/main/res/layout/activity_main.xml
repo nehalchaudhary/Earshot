@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/wrapper">
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:background="#fcfcfc"-->
+    <!--android:orientation="vertical"-->
+    <!--android:weightSum="1">-->
+
+    <!--<ScrollView-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content" >-->
+
+        <!--<LinearLayout-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="vertical" >-->
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="43dp"-->
+                <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+                <!--android:text=""-->
+                <!--android:id="@+id/user_name"-->
+                <!--android:layout_gravity="right" />-->
+
+            <!--<Button-->
+                <!--android:id="@+id/start"-->
+                <!--android:layout_width="fill_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="Start" />-->
+
+            <!--<Button-->
+                <!--android:id="@+id/stop"-->
+                <!--android:layout_width="fill_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="Stop" />-->
+
+            <!--<Button-->
+                <!--android:id="@+id/cancel"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="Cancel" />-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/volume"-->
+                <!--android:layout_width="fill_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:textColor="#000000" />-->
+
+        <!--</LinearLayout>-->
+    <!--</ScrollView>-->
+
+
+    <FrameLayout
+        android:id="@+id/toolbar_list"
+        android:background="@color/indigo"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_toolbar">
+
+        <TextView
+            android:text="@string/title_song"
+            android:textColor="@color/white"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-bold"
+            android:textSize="@dimen/text_size_toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/toolbar_song"
+        android:background="@color/indigo"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_toolbar"
+        android:clickable="true"
+        android:visibility="invisible">
+
+        <ImageView
+            android:id="@+id/toolbar_song_back"
+            android:layout_width="@dimen/height_toolbar"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center"
+            android:padding="15dp"
+            android:src="@drawable/abc_ic_ab_back_mtrl_am_alpha" />
+
+    </RelativeLayout>
+
+    <!--<Button-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Log in with spotify"-->
+        <!--android:id="@+id/login" />-->
+
+    <LinearLayout
+        android:id="@+id/wrapper_song_details"
+        android:layout_marginTop="@dimen/height_song_picture_with_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white"
+        android:visibility="invisible"
+        android:clickable="true">
+
+        <TextView
+            android:id="@+id/text_view_song_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/gray"
+            tools:text="Song"
+            android:fontFamily="sans-serif-light"
+            android:textSize="32sp"
+            android:layout_margin="10dp" />
+
+        <TextView
+            android:id="@+id/text_view_artist_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/gray"
+            tools:text="Song"
+            android:fontFamily="sans-serif-light"
+            android:textSize="30sp"
+            android:layout_margin="10dp" />
+
+        <TextView
+            android:id="@+id/text_view_album_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/gray"
+            tools:text="Song"
+            android:fontFamily="sans-serif-light"
+            android:textSize="30sp"
+            android:layout_margin="10dp" />
+
+        <!--<ScrollView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_marginLeft="10dp"-->
+            <!--android:layout_marginRight="10dp"-->
+            <!--android:layout_marginBottom="10dp">-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/text_view_profile_description"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:textColor="@color/gray"-->
+                <!--tools:text="@string/lorem_ipsum_long"-->
+                <!--android:fontFamily="sans-serif"-->
+                <!--android:textSize="18sp" />-->
+
+        <!--</ScrollView>-->
+
+    </LinearLayout>
+
+    <include
+        layout="@layout/add_to_spotify_button"
+        android:layout_width="@dimen/size_button_message"
+        android:layout_height="@dimen/size_button_message"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
+        android:visibility="invisible"
+        android:layout_marginTop="@dimen/margin_top_button_message"
+        android:id="@+id/button_add" />
+
+
+    <com.earshot.project.main.views.MicrophoneView
+        android:id="@+id/record"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:id="@+id/loginButton"
+        android:layout_below="@+id/toolbar_list"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="93dp" />
+
+</RelativeLayout>
+<!--</LinearLayout>-->
+
+<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:tools="http://schemas.android.com/tools" android:id="@+id/container"-->
+    <!--android:layout_width="match_parent" android:layout_height="match_parent"-->
+    <!--tools:context=".MainActivity" tools:ignore="MergeRootFrame" >-->
+
+    <!--<fragment-->
+        <!--class="com.earshot.project.main.views.RecordControlFragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"/>-->
+
+<!--</FrameLayout>-->

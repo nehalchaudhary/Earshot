@@ -1,0 +1,13 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="size_button_message">60dp</dimen>
+
+    <dimen name="height_toolbar">60dp</dimen>
+    <dimen name="height_song_image">250dp</dimen>
+    <dimen name="text_size_toolbar_title">25sp</dimen>
+    <dimen name="text_size_song_toolbar_title">20sp</dimen>
+    <dimen name="height_song_picture_with_toolbar">320dp</dimen>
+    <dimen name="margin_top_button_message">290dp</dimen>
+</resources>
