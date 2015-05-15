@@ -13,7 +13,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -56,7 +55,7 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
 
     RecordListener mRecordListener;
     Spotify mSpotify;
-    protected Button mLoginButton;
+
     private TextView mUserName;
     String token;
 
@@ -76,6 +75,8 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
     protected View mButtonAdd;
     protected View mOverlay;
     protected Ripples mRippleBackground;
+    protected ImageView mLogout;
+
 
     private float mInitialSongButtonX;
 
@@ -90,7 +91,6 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
     static int sSongImageHeight;
 
     protected SpotifyTrack spotifyTrack;
-    protected Spotify spotify;
 
 
     //Animation constants
@@ -115,14 +115,14 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
         mTextViewAlbumName = (TextView) findViewById(R.id.text_view_album_name);
         mTextViewArtistName = (TextView) findViewById(R.id.text_view_artist_name);
         mButtonAdd = findViewById(R.id.spotify_add);
+        mLogout = (ImageView) findViewById(R.id.logout);
 
         mRippleBackground =(Ripples)findViewById(R.id.ripples);
 
         mRecordButton = (MicrophoneView) findViewById(R.id.micButton);
-        mLoginButton = (Button) findViewById(R.id.loginButton);
 
         mInitialSongButtonX = mButtonAdd.getX();
-        spotify = SpotifySingleton.getSpotifyInstance(this);
+        mSpotify = SpotifySingleton.getSpotifyInstance(this);
 
         findViewById(R.id.song_details_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -130,6 +130,14 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
                 animateCloseSongDetails();
             }
         });
+        mLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSpotify.logout();
+                mLogout.setVisibility(View.INVISIBLE);
+            }
+        });
+
         sScreenWidth = getResources().getDisplayMetrics().widthPixels;
         sSongImageHeight = getResources().getDimensionPixelSize(R.dimen.height_song_image);
     }
@@ -141,12 +149,6 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
         mRecordListener = new RecordListener(this);
         mRecordListener.registerListener(this);
         mSpotify = SpotifySingleton.getSpotifyInstance(this);
-        mLoginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mSpotify.login();
-            }
-        });
 
         mRecordButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,10 +174,12 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
 
     public void addToPlyalist(){
         String token = EarshotUtils.getFromSharedPreference("token",getApplicationContext());
-        if (token == null)
-            spotify.login();
-        else
-            spotify.setUserId(spotifyTrack.getTrackId());
+        if (token == null) {
+            mSpotify.login();
+        }
+        else {
+            mLogout.setVisibility(View.VISIBLE);
+        }
     }
 
     private void showSongDetails(SpotifyTrack track){
@@ -334,10 +338,17 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
                 mSongDetails.bringToFront();
                 mSongDetails.setVisibility(View.VISIBLE);
                 mButtonAdd.bringToFront();
+                String token = EarshotUtils.getFromSharedPreference("token", getApplicationContext());
+                if (token == null){
+                    mLogout.setVisibility(View.INVISIBLE);
+                } else {
+                    mLogout.setVisibility(View.VISIBLE);
+                }
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
+
                 mButtonAdd.startAnimation(mAddButtonShowAnimation);
 
                 mState = AnimationState.Opened;
@@ -504,8 +515,6 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
     };
 
 
-
-
     @Override
     public void onRecognozeFailure() {
         if (mRecordButton.getRecordingMode()){
@@ -530,8 +539,10 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
                 case TOKEN:
                     // Save the token in shared preferences
                     EarshotUtils.storeInSharedPreference("token", response.getAccessToken(),this);
-                    spotify.setUserId(spotifyTrack.getTrackId());
+                    mSpotify.setUserId(spotifyTrack.getTrackId());
                     Log.i(TAG, "AUTHENTICATION SUCCESSFUL");
+                    mLogout.setVisibility(View.VISIBLE);
+
                     break;
 
                 case ERROR:

@@ -19,5 +19,6 @@
     <string name="title_activity_new">NewActivity</string>
 
     <string name='title_song'>EarShot</string>
-    
+    <string name="logout">logout</string>
+
 </resources>
