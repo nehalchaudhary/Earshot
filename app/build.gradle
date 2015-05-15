@@ -23,9 +23,6 @@ repositories {
     flatDir {
         dirs 'libs'
     }
-    maven {
-        url "https://jitpack.io"
-    }
 }
 
 dependencies {
@@ -36,5 +33,4 @@ dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.squareup.picasso:picasso:2.5.0'
-    compile 'com.github.ozodrukh:CircularReveal:1.0.6@aar'
 }
