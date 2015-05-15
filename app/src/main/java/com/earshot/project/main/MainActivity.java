@@ -476,6 +476,12 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
                 showSongDetails(spotifyTrack);
 
             } catch (JSONException e) {
+                Toast.makeText(getApplicationContext(), "Couldn't find the track on Spotify", Toast.LENGTH_LONG).show();
+                if (mRecordButton.getRecordingMode()){
+                    mRippleBackground.stopRippleAnimation();
+                    mRecordButton.setRecordingMode(false);
+                    mRecordButton.invalidate();
+                }
                 Log.i(TAG,"tRack could not be found in spotify");
                 e.printStackTrace();
             }
@@ -494,8 +500,9 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
         if (mRecordButton.getRecordingMode()){
             mRippleBackground.stopRippleAnimation();
             mRecordButton.setRecordingMode(false);
+            mRecordButton.invalidate();
         }
-        Toast.makeText(getApplicationContext(), "Couldn't find the track.", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Couldn't recognize the track.", Toast.LENGTH_LONG).show();
 
     }
 

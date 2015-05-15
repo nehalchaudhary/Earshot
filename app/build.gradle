@@ -19,7 +19,7 @@ android {
 }
 
 repositories {
-    //mavenCentral()
+    mavenCentral()
     flatDir {
         dirs 'libs'
     }
@@ -29,12 +29,14 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.android.support:support-v4:21.1.0'
     compile files('libs/DoresoSdkV3.2.0.jar')
     compile 'com.spotify.sdk:spotify-auth:1.0.0-beta9@aar'
     compile files('libs/volley.jar')
-    compile 'com.github.ozodrukh:CircularReveal:1.0.6@aar'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.squareup.picasso:picasso:2.5.0'
+    compile 'com.github.ozodrukh:CircularReveal:1.0.6@aar'
+
+
 }
