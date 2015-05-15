@@ -89,6 +89,9 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
     static int sScreenWidth;
     static int sSongImageHeight;
 
+    protected SpotifyTrack spotifyTrack;
+    protected Spotify spotify;
+
 
     //Animation constants
     private static final int MAX_DELAY_SHOW_DETAILS_ANIMATION = 500;
@@ -119,6 +122,7 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
         mLoginButton = (Button) findViewById(R.id.loginButton);
 
         mInitialSongButtonX = mButtonAdd.getX();
+        spotify = SpotifySingleton.getSpotifyInstance(this);
 
         findViewById(R.id.song_details_back).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,7 +171,11 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
 
 
     public void addToPlyalist(){
-
+        String token = EarshotUtils.getFromSharedPreference("token",getApplicationContext());
+        if (token == null)
+            spotify.login();
+        else
+            spotify.setUserId(spotifyTrack.getTrackId());
     }
 
     private void showSongDetails(SpotifyTrack track){
@@ -472,7 +480,7 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
                 JSONObject artistObject = artistsArray.getJSONObject(0);
                 String artist = artistObject.getString("name");
 
-                SpotifyTrack spotifyTrack = new SpotifyTrack(track, trackId, artist, album, previewURL, popularity, uri, imageURL);
+                spotifyTrack = new SpotifyTrack(track, trackId, artist, album, previewURL, popularity, uri, imageURL);
                 showSongDetails(spotifyTrack);
 
             } catch (JSONException e) {
@@ -494,6 +502,9 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
             Log.d(TAG, error.toString());
         }
     };
+
+
+
 
     @Override
     public void onRecognozeFailure() {
@@ -519,16 +530,11 @@ public class MainActivity extends FragmentActivity implements RecordListener.Rec
                 case TOKEN:
                     // Save the token in shared preferences
                     EarshotUtils.storeInSharedPreference("token", response.getAccessToken(),this);
-
+                    spotify.setUserId(spotifyTrack.getTrackId());
                     Log.i(TAG, "AUTHENTICATION SUCCESSFUL");
-//                    mUserName = (TextView) findViewById(R.id.user_name);
-//                    mUserName.setText("you are logged in");
-//                    findViewById(R.id.login).setVisibility(View.GONE);
                     break;
 
-                // Auth flow returned an error
                 case ERROR:
-                    // Handle error response
                     break;
 
                 // Most likely auth flow was cancelled

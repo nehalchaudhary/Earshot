@@ -24,8 +24,8 @@ public class RecordListener implements DoresoRecordInterface,DoresoListener {
     private boolean mProcessing;
     private DoresoConfig mConfig;
     private static final String TAG = RecordListener.class.getSimpleName();
-    private static final String APPKEY = "";
-    private static final String APPSECRET = "";
+    private static final String APPKEY = "SZvaZLlThD5N4zOwiuWEvKCXjOAs2cDxzJFDFPeXg1k";
+    private static final String APPSECRET = "ae08fc357670a7ecbefdbffb9f176c10";
     RecordListnerResultListener listener;
 
     public RecordListener(Activity context) {
